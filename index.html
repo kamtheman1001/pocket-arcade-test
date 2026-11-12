@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f5f7fb" />
+  <title>Pocket Arcade — Safari Test</title>
+  <style>
+    :root { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #17243b; background: #f5f7fb; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px 16px; }
+    main { max-width: 620px; margin: 0 auto; }
+    header, .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    header { margin-bottom: 26px; }
+    .logo { width: 46px; height: 46px; border-radius: 14px; background: #2563eb; color: #fff; display: grid; place-items: center; font-size: 24px; }
+    h1 { margin: 0; font-size: 23px; letter-spacing: -.5px; }
+    p { line-height: 1.5; }
+    .muted { color: #64748b; margin: 4px 0 0; font-size: 14px; }
+    .card { background: #fff; border: 1px solid #e8edf5; border-radius: 20px; padding: 22px; margin-bottom: 14px; box-shadow: 0 4px 18px #152a5010; }
+    .blue { background: #e8efff; border-color: #dae5ff; }
+    .status { font-size: 14px; padding: 7px 12px; background: #e6f8ed; color: #176a39; border-radius: 100px; font-weight: 600; }
+    .status.bad { color: #a33333; background: #ffeded; }
+    .label { font-weight: 650; font-size: 15px; }
+    .balance { font-size: 34px; font-weight: 700; margin: 14px 0; letter-spacing: -1px; }
+    .bars { display: flex; gap: 7px; }
+    .bars span { height: 11px; border-radius: 8px; background: #e1e8f1; flex: 1; }
+    .bars span.on { background: #3b82f6; }
+    .reels { display: flex; justify-content: center; gap: 15px; margin: 20px 0; }
+    .reels span { width: 74px; height: 78px; background: #f5f7fb; display: grid; place-items: center; border-radius: 15px; font-size: 35px; }
+    button { background: #2563eb; color: #fff; border: none; padding: 14px 18px; border-radius: 12px; font-size: 15px; font-weight: 650; cursor: pointer; touch-action: manipulation; }
+    button:disabled { background: #9aabc5; cursor: default; }
+    button.secondary { background: #eaf0f9; color: #254266; }
+    button:focus-visible { outline: 3px solid #93c5fd; outline-offset: 3px; }
+    #message { min-height: 42px; text-align: center; font-size: 14px; color: #475569; }
+    .footer { text-align: center; font-size: 12px; color: #94a3b8; margin-top: 22px; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="row" style="justify-content:flex-start">
+      <div class="logo">▦</div>
+      <div><h1>Pocket Arcade</h1><p class="muted">Safari compatibility test</p></div>
+    </div>
+    <div id="jsStatus" class="status bad">Checking…</div>
+  </header>
+
+  <section class="card blue">
+    <div class="row"><span class="label">Play Tickets</span><span class="muted">Test balance</span></div>
+    <div class="balance"><span id="tickets">5</span> / 5 🎟️</div>
+    <div class="bars" id="bars" aria-label="Ticket balance"></div>
+    <p class="muted">Each demo play costs 1 ticket. You can reset the test anytime.</p>
+  </section>
+
+  <section class="card">
+    <div class="row"><span class="label">Mini Slots — Test Game</span><span class="muted">1 ticket</span></div>
+    <div class="reels" aria-label="Slot symbols"><span id="reel1">🍋</span><span id="reel2">⭐</span><span id="reel3">🍀</span></div>
+    <p id="message" role="status">Tap Play to test buttons and JavaScript.</p>
+    <button id="play" style="width:100%">Play Demo</button>
+  </section>
+
+  <section class="card">
+    <div class="row"><span class="label">Saved progress</span><span id="saveStatus" class="status bad">Checking…</span></div>
+    <p class="muted">Coins earned: <strong id="coins">0</strong> · Plays: <strong id="plays">0</strong></p>
+    <p class="muted">Refresh Safari. If your tickets, coins, and plays stay the same, browser storage works.</p>
+    <div style="margin-top:16px"><button class="secondary" id="reset">Reset test</button></div>
+  </section>
+  <p class="footer">No downloads · No real money · Single-file test page</p>
+</main>
+
+<script>
+  // All logic stays in this file for the first iPad test.
+  const KEY = 'pocket-arcade-safari-test-v1';
+  const defaults = { tickets: 5, coins: 0, plays: 0 };
+  let storageWorks = false;
+  let state = { ...defaults };
+
+  try {
+    localStorage.setItem(KEY + '-check', 'ok');
+    storageWorks = localStorage.getItem(KEY + '-check') === 'ok';
+    localStorage.removeItem(KEY + '-check');
+    const saved = localStorage.getItem(KEY);
+    if (saved) state = { ...defaults, ...JSON.parse(saved) };
+  } catch (error) {
+    storageWorks = false;
+  }
+
+  function save() {
+    if (storageWorks) {
+      try { localStorage.setItem(KEY, JSON.stringify(state)); }
+      catch (error) { storageWorks = false; showStatus(); }
+    }
+  }
+
+  function showStatus() {
+    const saveStatus = document.getElementById('saveStatus');
+    saveStatus.textContent = storageWorks ? 'Working ✓' : 'Unavailable';
+    saveStatus.classList.toggle('bad', !storageWorks);
+  }
+
+  function render() {
+    document.getElementById('tickets').textContent = state.tickets;
+    document.getElementById('coins').textContent = state.coins;
+    document.getElementById('plays').textContent = state.plays;
+    document.getElementById('play').disabled = state.tickets === 0;
+    document.getElementById('bars').innerHTML = Array.from({ length: 5 }, (_, i) =>
+      `<span class="${i < state.tickets ? 'on' : ''}"></span>`).join('');
+  }
+
+  document.getElementById('jsStatus').textContent = 'JavaScript ✓';
+  document.getElementById('jsStatus').classList.remove('bad');
+  showStatus();
+  render();
+
+  document.getElementById('play').addEventListener('click', () => {
+    if (state.tickets <= 0) return;
+    const symbols = ['🍋', '⭐', '🍀', '🍒'];
+    const result = Array.from({ length: 3 }, () => symbols[Math.floor(Math.random() * symbols.length)]);
+    result.forEach((symbol, i) => { document.getElementById(`reel${i + 1}`).textContent = symbol; });
+    const match = result.every(s => s === result[0]);
+    const earned = match ? 30 : 5;
+    state.tickets -= 1;
+    state.coins += earned;
+    state.plays += 1;
+    document.getElementById('message').textContent = match ? `Triple match! +${earned} coins` : `Nice! +${earned} coins`;
+    save();
+    render();
+  });
+
+  document.getElementById('reset').addEventListener('click', () => {
+    state = { ...defaults };
+    document.getElementById('message').textContent = 'Test reset. Ready to play again!';
+    save();
+    render();
+  });
+</script>
+</body>
+</html>
