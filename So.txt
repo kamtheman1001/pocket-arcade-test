@@ -1,0 +1,1454 @@
+Game Development Concept: Clash Royale-Style Real-Time Strategy Game
+
+1. General Game Concept
+
+I want to create a real-time multiplayer strategy game inspired by Clash Royale. The game combines elements of tower defense, collectible cards, resource management, and competitive PvP combat.
+
+The player controls an army indirectly by placing cards onto a battlefield. Each card represents a troop, building, or spell with different abilities, statistics, and costs.
+
+Instead of directly controlling characters, players make strategic decisions about:
+
+* Which cards to deploy.
+* Where to deploy them.
+* When to spend resources.
+* Which enemy units to counter.
+* Whether to attack or defend.
+* How to combine units to create powerful attacks.
+
+Battles should be relatively short, lasting approximately 3–5 minutes.
+
+The game must feel fast-paced, responsive, strategic, and visually satisfying. Every troop should move, attack, take damage, and react independently once deployed.
+
+The most important design principle is that the player controls the strategy, while the game automatically handles individual unit behavior.
+
+⸻
+
+2. Battlefield and Arena Design
+
+The main battlefield should be a rectangular arena viewed from an elevated, slightly angled, top-down perspective.
+
+The arena is divided horizontally into two territories.
+
+The bottom half belongs to the local player, and the top half belongs to their opponent.
+
+Arena Layout
+
+The battlefield contains:
+
+* Two opposing player territories.
+* A river separating both territories.
+* Two bridges connecting the territories.
+* Two main combat lanes.
+* Six total towers, three belonging to each player.
+* Designated placement zones for deploying units.
+
+Each player owns three towers:
+
+Left Defense Tower
+
+Located toward the front-left side of the player’s territory.
+
+Right Defense Tower
+
+Located toward the front-right side of the player’s territory.
+
+King Tower
+
+Located toward the back-center of the player’s territory.
+
+The two smaller towers automatically attack approaching enemies.
+
+The King Tower is a stronger central defensive structure that initially remains inactive. It begins attacking after receiving damage or after one of its defending towers has been destroyed.
+
+Battlefield Behavior
+
+Units should normally navigate toward the enemy using one of the two bridges.
+
+Ground troops should not freely cross the river except by using a valid bridge or a special movement ability.
+
+Flying troops can ignore the river and move directly toward their targets.
+
+The environment should contain clear visual boundaries showing where cards may be deployed.
+
+Normally, players may deploy troops only within their own territory.
+
+After destroying an opponent’s side tower, additional placement territory becomes available on that side of the battlefield.
+
+This allows the player to deploy units deeper into enemy territory, creating an advantage for successful attacks.
+
+The arena should be symmetrical for both players to maintain fair gameplay.
+
+⸻
+
+3. Main Objective and Winning Conditions
+
+The primary objective is to destroy more enemy towers than the opponent while protecting your own.
+
+Each destroyed side tower counts as one crown.
+
+Destroying the enemy King Tower immediately ends the battle and gives the attacking player a three-crown victory.
+
+Standard Match Rules
+
+A standard match consists of:
+
+Regular Battle: 3 minutes
+
+Both players deploy cards, defend their towers, and attempt to destroy enemy towers.
+
+Overtime: Up to 2 minutes
+
+If both players have the same number of crowns after regular time expires, the game enters sudden-death overtime.
+
+The first player to destroy another enemy tower wins.
+
+Tiebreaker
+
+If no tower is destroyed during overtime, the game compares remaining tower health to determine a winner using a health-based tiebreaker.
+
+Exact ties can be handled according to the chosen game mode.
+
+Match End Conditions
+
+The match ends when:
+
+1. A player’s King Tower is destroyed.
+2. Regular time expires with one player holding more crowns.
+3. A player destroys a tower during sudden-death overtime.
+4. The overtime clock expires and a tiebreaker determines the winner.
+
+After the match ends, all troops should stop moving, the camera should emphasize the result, and a victory or defeat screen should appear.
+
+⸻
+
+4. Elixir and Resource Management
+
+Elixir is the primary resource used during battles.
+
+Every card has an elixir cost, which determines how expensive it is to deploy.
+
+Elixir regenerates automatically over time.
+
+The player’s current elixir amount is displayed as a horizontal resource bar at the bottom of the screen.
+
+Elixir Mechanics
+
+* Maximum elixir capacity: 10.
+* Players start with a partially filled elixir bar.
+* Elixir regenerates continuously.
+* Playing a card immediately subtracts its cost.
+* A player cannot deploy a card without sufficient elixir.
+* Elixir regeneration pauses at the maximum capacity until some is spent.
+
+For example:
+
+A player has 8 elixir.
+
+They deploy a troop costing 5 elixir.
+
+Their remaining elixir becomes 3.
+
+The bar continues regenerating, allowing them to deploy additional cards.
+
+Elixir Regeneration Phases
+
+For standard battles, implement the following regeneration phases:
+
+Match Phase	Regeneration
+First minute	Normal (1x)
+Second minute	Normal (1x)
+Third minute	Double (2x)
+First overtime minute	Double (2x)
+Final overtime minute	Triple (3x)
+
+The progression of elixir generation is extremely important.
+
+Early gameplay should encourage careful resource spending and smaller engagements.
+
+Late gameplay should allow players to deploy more troops and create significantly larger battles.
+
+Resource Strategy
+
+A cheap troop should be capable of countering a more expensive troop under the right circumstances.
+
+For example, a 3-elixir defensive unit might defeat a 5-elixir attacking unit if placed correctly.
+
+This creates a positive elixir trade and gives the defending player a resource advantage.
+
+The game should reward effective resource management rather than simply deploying the strongest available units.
+
+⸻
+
+5. Card and Deck System
+
+The player should build a battle deck containing eight cards.
+
+Each card represents an action that can be performed in battle.
+
+There are three primary card categories:
+
+Troop Cards
+
+Summon one or more units that automatically move and attack.
+
+Examples include:
+
+* Melee warriors.
+* Ranged archers.
+* Heavy armored tanks.
+* Flying creatures.
+* Fast attacking units.
+* Swarms of weaker units.
+* Support units with special abilities.
+* Units that specifically target buildings.
+
+Building Cards
+
+Place a defensive or utility structure onto the battlefield.
+
+Examples include:
+
+* Defensive cannons.
+* Archer towers.
+* Mortar-like structures.
+* Troop-spawning buildings.
+* Resource-generating structures.
+
+Buildings should generally have a limited lifetime and may also be destroyed by enemy attacks.
+
+Spell Cards
+
+Activate an immediate or temporary effect in a selected area.
+
+Examples include:
+
+* Direct damage explosions.
+* Lightning strikes.
+* Area-of-effect damage.
+* Slowing fields.
+* Freezing effects.
+* Healing or regeneration effects.
+* Knockback effects.
+* Temporary stat boosts.
+
+Unlike troops, spells usually do not create a permanent moving unit.
+
+⸻
+
+6. Card Hand and Cycle Mechanics
+
+Although the player owns eight cards in their deck, only four should be available to play at a time.
+
+The four active cards appear horizontally at the bottom of the screen.
+
+A smaller indicator displays which card will appear next.
+
+Card Cycle Behavior
+
+At the beginning of the match:
+
+1. The eight-card deck is shuffled into an initial order.
+2. Four cards are displayed in the active hand.
+3. The remaining cards form a queue.
+4. When the player deploys a card, it leaves their hand.
+5. The next card in the queue replaces it.
+6. The played card is placed at the back of the cycle.
+7. After cycling through four other cards, the previously used card becomes available again.
+
+The player should never have access to all eight cards simultaneously.
+
+This system is essential because it introduces strategic limitations.
+
+For example, the player might have a strong counter to an enemy unit but cannot use it until they cycle through enough cards.
+
+The interface should display the current card hand, elixir costs, and next card clearly.
+
+Cards should visually indicate whether the player has enough elixir to use them.
+
+⸻
+
+7. Card Deployment System
+
+Players should be able to deploy cards through a simple drag-and-drop interaction.
+
+Deployment Process
+
+1. The player selects a card from their hand.
+2. The card becomes highlighted.
+3. The player drags toward the arena.
+4. A translucent placement preview appears.
+5. The game checks whether the position is valid.
+6. If valid, releasing the card deploys the unit or activates the effect.
+7. Elixir is deducted.
+8. The card leaves the active hand.
+9. The next card enters the hand.
+
+Placement Restrictions
+
+Troops and buildings should have restricted deployment areas.
+
+Spell cards may have different targeting rules and often can be used across the whole arena.
+
+Invalid locations should appear highlighted in red.
+
+Valid locations should display a normal placement indicator.
+
+If the player releases a card in an invalid location, it should return to their hand without spending elixir.
+
+Troop Spawn Delay
+
+Troops should have a brief deployment animation before entering combat.
+
+This prevents units from appearing and instantly attacking with no visual feedback.
+
+Certain cards can have special deployment effects, such as jumping into the arena, spawning underground, or dropping from the sky.
+
+⸻
+
+8. Troop AI and Automatic Movement
+
+Every deployed troop should operate independently using an automated AI system.
+
+Players do not manually control movement, attacks, or targeting after deployment.
+
+Required Unit Statistics
+
+Each troop should have configurable attributes including:
+
+Attribute	Purpose
+Health	Damage the unit can receive
+Damage	Damage inflicted per attack
+Attack speed	Time between attacks
+Movement speed	Movement rate
+Attack range	Distance from which it can attack
+Detection range	Distance used to find targets
+Target preference	Which enemies it prioritizes
+Attack type	Melee, ranged, or special
+Movement type	Ground or flying
+Elixir cost	Deployment cost
+Deployment count	Number of units spawned
+Special ability	Optional unique behavior
+
+Basic AI Behavior
+
+Each troop should follow this general process:
+
+State 1: Spawning
+
+The troop appears at the designated location and plays its spawning animation.
+
+State 2: Searching
+
+The troop evaluates nearby objects and searches for a valid target.
+
+State 3: Moving
+
+If no valid target is within attack range, the troop moves toward its selected target.
+
+State 4: Attacking
+
+When the troop reaches attack range, it stops moving if necessary and begins attacking.
+
+State 5: Retargeting
+
+If the current target dies, disappears, or becomes invalid, the troop selects another valid target.
+
+State 6: Death
+
+When health reaches zero, the troop plays a death animation, stops participating in combat, and is removed.
+
+Troop Targeting
+
+Troops should not randomly attack everything.
+
+Each troop has a targeting preference.
+
+Examples:
+
+Standard Melee Unit
+
+Attacks the closest valid enemy troop or building.
+
+Building-Focused Unit
+
+Ignores ordinary enemy troops and attempts to reach enemy buildings or towers.
+
+Anti-Air Unit
+
+Can attack flying units and ground units.
+
+Ground-Only Unit
+
+Cannot target flying enemies.
+
+Ranged Unit
+
+Attempts to attack enemies from a distance rather than moving directly into melee range.
+
+Splash-Damage Unit
+
+Damages multiple enemies within an area.
+
+Pathfinding
+
+Ground troops should navigate around obstacles and toward valid river crossings.
+
+Units may need to move around other troops, buildings, and environmental barriers.
+
+The system should prevent units from becoming permanently stuck.
+
+Flying troops should use a different navigation system that allows them to cross the river directly.
+
+Pathfinding should be efficient enough to handle dozens of moving units simultaneously.
+
+⸻
+
+9. Combat and Damage System
+
+Combat should happen automatically once troops are within range of valid targets.
+
+Each attack should use the unit’s damage, attack speed, and any special modifiers.
+
+Basic Attack Sequence
+
+1. Identify a valid enemy.
+2. Move into attack range.
+3. Begin the attack animation.
+4. Apply damage at the correct animation moment.
+5. Trigger hit effects.
+6. Wait for the attack cooldown.
+7. Repeat until the target is destroyed or becomes invalid.
+
+Attack Types
+
+Melee Attacks
+
+Require the attacker to be close to the target.
+
+Projectile Attacks
+
+Create a projectile that travels toward the selected target.
+
+Area-of-Effect Attacks
+
+Apply damage to multiple enemies within a defined radius.
+
+Piercing Attacks
+
+Allow a projectile to damage multiple enemies along its path.
+
+Chain Attacks
+
+Bounce between nearby enemies.
+
+Damage-Over-Time Attacks
+
+Apply damage repeatedly over a duration.
+
+Status Effects
+
+Some troops and spells should apply temporary effects such as:
+
+* Slow.
+* Stun.
+* Freeze.
+* Poison.
+* Burn.
+* Knockback.
+* Rage or attack-speed boosts.
+* Healing.
+* Shields.
+
+These effects should be controlled through a centralized status-effect system.
+
+For example, a frozen troop should stop moving and attacking until the effect expires.
+
+Different effects should have configurable durations, strengths, stacking rules, and immunities.
+
+Collision and Hit Detection
+
+The game should use consistent collision boundaries for all troops and towers.
+
+Projectile hits, melee ranges, area damage, and spell impacts should be evaluated by the authoritative game simulation.
+
+Visual effects must match actual gameplay calculations.
+
+⸻
+
+10. Tower Mechanics
+
+Towers are the most important defensive structures.
+
+Each player has two side towers and one King Tower.
+
+Side Towers
+
+Side towers should:
+
+* Have a health bar.
+* Automatically detect enemies.
+* Attack valid enemies within range.
+* Use a configurable attack speed.
+* Display damage effects.
+* Collapse when health reaches zero.
+
+King Tower
+
+The King Tower should:
+
+* Have significantly more health.
+* Be positioned behind the side towers.
+* Initially remain inactive.
+* Activate when directly damaged or when a friendly side tower is destroyed.
+* Attack enemies once activated.
+* Immediately trigger defeat if destroyed.
+
+Tower Targeting
+
+Towers should prioritize valid enemies within their attack range.
+
+Targeting should be predictable so players can deliberately use cheap units to distract towers while stronger units attack.
+
+The game may also support different tower weapon configurations.
+
+For example:
+
+* Fast-attacking tower with moderate damage.
+* Slow-attacking tower with high damage.
+* Area-damage tower.
+* Support-oriented tower with a unique passive ability.
+
+Tower health and attack statistics should scale according to the player’s progression or according to standardized competitive levels.
+
+⸻
+
+11. Unit Roles and Deck Strategy
+
+Cards should have specific strategic roles.
+
+The goal is to make deck building an important part of the game.
+
+Tanks
+
+High-health units that absorb damage.
+
+Usually move slowly and cost more elixir.
+
+Damage Dealers
+
+Units that deal high damage but may have limited health.
+
+They work best behind tanks or when protected.
+
+Swarm Units
+
+Deploy multiple weaker troops.
+
+Effective against single-target attackers but vulnerable to area damage.
+
+Support Units
+
+Provide ranged attacks, healing, crowd control, or special effects.
+
+Win Conditions
+
+Cards designed to reach and damage enemy towers.
+
+These are the primary offensive tools around which a deck is built.
+
+Defensive Cards
+
+Buildings and specialized troops that counter enemy attacks.
+
+Cycle Cards
+
+Low-cost cards that let the player rotate through the deck quickly.
+
+A well-designed deck should combine offense, defense, and utility.
+
+No single card should consistently defeat every other card.
+
+⸻
+
+12. Example Cards for the First Playable Version
+
+I would like the first development version to include a small but varied collection of cards.
+
+The following are proposed original placeholder cards, with example statistics that can be adjusted during balancing.
+
+Card	Cost	Function
+Swordsman	3	Basic melee fighter
+Longbow Archer	3	Ranged ground and air attacker
+Iron Guardian	5	Slow, high-health tank
+Twin Raiders	2	Summons two fast melee troops
+Siege Brute	5	Targets buildings only
+Fire Mage	4	Ranged splash damage
+Sky Drake	4	Flying splash attacker
+Spear Scout	2	Cheap ranged support
+Cannon	3	Temporary defensive building
+Guard Tower	4	Defensive ranged structure
+Fireburst	4	Instant area damage spell
+Frost Pulse	2	Small damage and brief slow
+Thunder Strike	6	High-damage spell
+Healing Field	3	Restores allied troop health
+Heavy Knight	4	Durable melee defender
+Shadow Assassin	4	Fast burst-damage attacker
+
+Each card should have its own configuration data so its statistics can be adjusted without rewriting the underlying game systems.
+
+⸻
+
+13. Advanced Card Abilities
+
+After the basic game works, I want to introduce cards with more complicated mechanics.
+
+Examples include:
+
+Charge Attacks
+
+A troop accelerates toward an enemy and deals bonus damage on its first hit.
+
+Death Effects
+
+A troop drops an explosive, creates smaller troops, or activates another effect when killed.
+
+Summoning
+
+A unit periodically creates additional friendly troops.
+
+Transformation
+
+A troop changes into a stronger or different form when a particular condition is met.
+
+Jumping
+
+A troop can leap over obstacles or directly toward a target.
+
+Burrowing
+
+A troop can move underground and appear near a designated position.
+
+Shields
+
+A troop has an additional protective health layer that must be destroyed before its normal health can be damaged.
+
+These behaviors should be modular.
+
+The same ability system should support multiple cards rather than requiring completely separate code for every troop.
+
+⸻
+
+14. Evolutions and Hero Cards
+
+I also want special versions of certain cards that introduce additional strategic possibilities.
+
+Evolved Cards
+
+Some cards should have unlockable evolved forms.
+
+An evolved form could gain:
+
+* A new attack.
+* An additional status effect.
+* Increased durability.
+* A unique passive ability.
+* Different deployment behavior.
+
+Evolutions can activate after the player cycles the card a specified number of times.
+
+For example, after one normal deployment and the required cycle, the next deployment may use the evolved version.
+
+The active card should visually change so the player knows its evolved form is ready.
+
+Hero Cards
+
+Hero cards should have abilities that the player can activate manually during a battle.
+
+After deploying a hero, an ability button appears near the player’s battle controls.
+
+Pressing it activates the hero’s ability, provided any required conditions or resources are available.
+
+Hero abilities might include:
+
+* Temporary invulnerability.
+* A powerful area attack.
+* Teleportation.
+* Summoning reinforcements.
+* Taunting nearby enemies.
+* Temporarily increasing attack speed.
+
+Special cards should be assigned through dedicated deck slots so their use can be limited and balanced.
+
+These systems should come after the core troop, spell, and building mechanics are stable.
+
+⸻
+
+15. Player Interface and HUD
+
+The user interface should be designed primarily for a vertical mobile screen, with the arena occupying most of the display.
+
+Battle HUD
+
+Top of Screen
+
+* Opponent username.
+* Opponent tower health values.
+* Remaining match time.
+* Crown score.
+* Overtime or special battle indicators.
+
+Center of Screen
+
+* Interactive battlefield.
+* Troops and buildings.
+* Projectiles.
+* Towers.
+* Unit health bars.
+* Deployment previews.
+* Combat effects.
+
+Bottom of Screen
+
+* Four playable cards.
+* Current elixir.
+* Elixir regeneration bar.
+* Next-card preview.
+* Active hero ability button, when applicable.
+
+Visual Feedback
+
+Cards should become dimmed when the player cannot afford them.
+
+Dragging a card should create a placement preview.
+
+The elixir bar should animate smoothly.
+
+Towers should visibly react when taking damage.
+
+Important events such as tower destruction, double elixir, and overtime should display clear screen notifications.
+
+The UI should be readable without obstructing the battlefield.
+
+⸻
+
+16. Main Menu and Navigation
+
+Outside of battle, the player should have access to a polished home screen.
+
+Home Screen
+
+The home screen should include:
+
+* Player profile.
+* Current arena.
+* Trophy count.
+* Current battle deck.
+* Main Battle button.
+* Progression rewards.
+* Currency balances.
+* News or event information.
+
+Cards and Collection Screen
+
+Players should be able to browse their unlocked cards.
+
+Selecting a card should display:
+
+* Card artwork.
+* Description.
+* Level.
+* Rarity.
+* Elixir cost.
+* Damage.
+* Health.
+* Attack speed.
+* Range.
+* Movement speed.
+* Special abilities.
+* Upgrade requirements.
+
+Deck Builder
+
+Players should be able to create and save multiple decks.
+
+The deck builder should allow cards to be swapped between slots.
+
+It should also calculate the average elixir cost of the active deck.
+
+Players should be warned when their deck is incomplete.
+
+⸻
+
+17. Multiplayer Networking
+
+Real-time multiplayer is a fundamental requirement.
+
+Both players must see the same battle state, with consistent unit positions, health values, resource spending, and combat results.
+
+Server-Authoritative Architecture
+
+I want the multiplayer system to be server-authoritative.
+
+This means the server determines important gameplay outcomes rather than blindly trusting the player’s device.
+
+The server should control:
+
+* Match timers.
+* Elixir regeneration.
+* Card deployment validation.
+* Troop spawning.
+* Unit movement.
+* Target acquisition.
+* Damage calculations.
+* Tower destruction.
+* Match results.
+
+The clients should primarily handle player input, rendering, sound, and visual effects.
+
+Example Deployment Flow
+
+1. Player A drags a card onto the battlefield.
+2. Their client sends a deployment request to the server.
+3. The server verifies the selected card is available.
+4. The server checks the player’s elixir.
+5. The server validates the placement location.
+6. If valid, the server deducts elixir and spawns the unit.
+7. The server updates the card cycle.
+8. Both players receive the new battle state.
+9. Both devices display the troop appearing.
+
+Networking Requirements
+
+The game should handle:
+
+* Latency.
+* Packet loss.
+* Player disconnections.
+* Temporary reconnects.
+* Duplicate input requests.
+* Synchronization errors.
+* Abnormally delayed client actions.
+
+A fixed simulation tick rate, for example 20–30 updates per second, could be used initially.
+
+Clients should interpolate movement between updates to keep animations smooth.
+
+Deployment responsiveness is especially important because even a small delay can change the outcome of a defensive interaction.
+
+⸻
+
+18. Matchmaking and Game Modes
+
+The game should initially support competitive 1v1 battles.
+
+1v1 Battles
+
+Two players are matched based on comparable skill or progression.
+
+Both enter the same arena and use their selected decks.
+
+Friendly Battles
+
+Players can invite friends to private matches without affecting their competitive ranking.
+
+Training Matches
+
+Players battle an AI-controlled opponent.
+
+This mode should help new players learn card mechanics.
+
+Ranked Battles
+
+Players compete to gain trophies or ranking points.
+
+Winning increases their rating, while losing may decrease it.
+
+The matchmaking system should attempt to find opponents of similar skill.
+
+Future Modes
+
+Possible additional modes include:
+
+* 2v2 battles.
+* Double-elixir battles.
+* Triple-elixir battles.
+* Draft mode.
+* Randomized decks.
+* Limited-card challenges.
+* Tournament mode.
+* Special-event arenas.
+
+The basic 1v1 system should be completed before additional modes are introduced.
+
+⸻
+
+19. AI Opponents
+
+I want AI opponents for testing, tutorials, and optional practice.
+
+The AI should use the same card and elixir mechanics as real players.
+
+It should not have unlimited resources or bypass standard placement rules.
+
+AI Decision-Making
+
+The AI should periodically evaluate:
+
+* Current elixir.
+* Available cards.
+* Enemy troops.
+* Tower health.
+* Enemy attacks.
+* Available deployment positions.
+* Offensive opportunities.
+
+The AI should use this information to choose an action.
+
+For example, if an enemy tank is approaching the left tower, the AI could deploy an appropriate defensive troop or building.
+
+If the opponent has spent most of their elixir, the AI could choose to attack the opposite lane.
+
+Difficulty Levels
+
+Easy
+
+Makes basic decisions and reacts slowly.
+
+Medium
+
+Uses reasonable counters and manages elixir.
+
+Hard
+
+Tracks enemy cards, makes efficient trades, and builds coordinated attacks.
+
+Expert
+
+Uses more advanced deck cycling, positioning, prediction, and offensive timing.
+
+⸻
+
+20. Progression and Unlocking
+
+Outside of battles, the player should work toward unlocking new cards, upgrading their collection, and progressing through different arenas.
+
+Trophy System
+
+Winning competitive matches grants trophies.
+
+Losing may remove trophies.
+
+As players reach trophy milestones, they unlock new arenas, rewards, and cards.
+
+Arena Progression
+
+Each arena should have a distinct visual theme.
+
+Examples:
+
+* Training Grounds.
+* Forest Arena.
+* Desert Arena.
+* Frozen Fortress.
+* Volcanic Battlefield.
+* Royal Citadel.
+
+Arenas should generally use the same underlying gameplay geometry unless a specific game mode intentionally changes it.
+
+This helps maintain competitive balance.
+
+Card Upgrading
+
+Cards should have levels.
+
+Higher levels can increase statistics such as health and damage.
+
+Players use collected card copies and in-game currency to upgrade cards.
+
+The maximum level should be configurable so the progression system can evolve.
+
+Card Rarity
+
+Cards can be divided into categories such as:
+
+* Common.
+* Rare.
+* Epic.
+* Legendary.
+* Champion.
+
+Rarity should influence acquisition and design complexity without automatically making a card unbeatable.
+
+⸻
+
+21. Rewards and Economy
+
+Players should earn rewards through normal gameplay.
+
+Possible rewards include:
+
+* Gold.
+* Card copies.
+* Chests.
+* Upgrade resources.
+* Cosmetic items.
+* Profile customization.
+* Battle emotes.
+
+Chests
+
+Chests should award randomly selected resources and cards from defined reward pools.
+
+More valuable chests could contain greater quantities or higher-rarity rewards.
+
+Shop
+
+The game could contain a shop offering:
+
+* Card bundles.
+* Cosmetic skins.
+* Emotes.
+* Arena decorations.
+* Limited-time offers.
+
+A premium currency could be introduced for optional purchases.
+
+Competitive balance should remain a major consideration when deciding how upgrades and monetization affect gameplay.
+
+⸻
+
+22. Visual Style and Animations
+
+The game should have a colorful, polished, stylized appearance.
+
+Characters should be readable even when viewed from relatively far away.
+
+Individual units need distinctive silhouettes so players can recognize them quickly.
+
+Required Animations
+
+Each troop should support:
+
+* Idle.
+* Spawn.
+* Walk or fly.
+* Attack.
+* Taking damage.
+* Death.
+* Special ability.
+
+Towers should support:
+
+* Idle.
+* Attacking.
+* Taking damage.
+* Destruction.
+
+Combat Effects
+
+Combat should include:
+
+* Projectile trails.
+* Impact flashes.
+* Explosion particles.
+* Small knockback reactions.
+* Damage indicators where appropriate.
+* Status-effect visuals.
+* Destruction debris.
+* Screen shake for important events.
+
+The effects should make combat feel impactful without making it difficult to see what is happening.
+
+Animation Principles
+
+Animations must reflect gameplay timing.
+
+For example, if a troop attacks once per second, its attack animation should visually communicate that timing.
+
+A projectile should not cause visible damage significantly before reaching its target.
+
+The game should prioritize clarity and responsiveness over unnecessary animation complexity.
+
+⸻
+
+23. Sound Design
+
+Audio should make important gameplay actions immediately recognizable.
+
+Sound Categories
+
+Card Deployment
+
+A distinct sound when a card is successfully played.
+
+Troop Attacks
+
+Different sounds for swords, arrows, explosions, and magical attacks.
+
+Troop Deaths
+
+Short death or destruction effects.
+
+Elixir Feedback
+
+Subtle feedback when resources become available.
+
+Tower Damage
+
+Impact sounds when a tower is attacked.
+
+Tower Destruction
+
+A dramatic destruction effect.
+
+Match Events
+
+Sounds for the beginning of a battle, double elixir, overtime, victory, and defeat.
+
+Each card should eventually have an identifiable sound identity.
+
+Audio should reinforce gameplay rather than overwhelm the player.
+
+⸻
+
+24. Technical System Architecture
+
+I would prefer the game to use modular, reusable systems rather than one large script controlling everything.
+
+The major systems should be separated into independent components.
+
+Core Managers
+
+MatchManager
+
+Controls match initialization, timers, match phases, and win conditions.
+
+ElixirManager
+
+Handles resource generation, maximum capacity, and spending.
+
+DeckManager
+
+Stores deck composition, active hand, card cycle, and next-card queue.
+
+CardManager
+
+Loads card definitions and handles card-related actions.
+
+DeploymentManager
+
+Validates and processes placement requests.
+
+UnitManager
+
+Creates, tracks, and removes active troops.
+
+MovementSystem
+
+Handles troop navigation, movement speeds, and positioning.
+
+TargetingSystem
+
+Determines which entities a troop can attack.
+
+CombatSystem
+
+Processes attacks, damage, projectiles, and health changes.
+
+EffectSystem
+
+Handles buffs, debuffs, special abilities, and temporary effects.
+
+TowerManager
+
+Controls defensive towers, tower targeting, and destruction.
+
+NetworkManager
+
+Handles multiplayer communication and synchronization.
+
+ProgressionManager
+
+Tracks player levels, trophies, unlocks, and upgrades.
+
+UIManager
+
+Updates interface elements and handles menus.
+
+Data-Driven Card Definitions
+
+Every card should have a reusable data structure.
+
+For example:
+
+{
+  "id": "iron_guardian",
+  "name": "Iron Guardian",
+  "type": "troop",
+  "rarity": "rare",
+  "elixirCost": 5,
+  "health": 1800,
+  "damage": 160,
+  "attackInterval": 1.5,
+  "movementSpeed": 1.2,
+  "attackRange": 1.0,
+  "targetType": "ground",
+  "targetPriority": "nearest",
+  "movementType": "ground",
+  "spawnCount": 1,
+  "ability": null
+}
+
+These are example development values, not final balancing numbers.
+
+The goal is to be able to add a new troop primarily by defining its stats, visual assets, and special behaviors.
+
+The core engine should not require substantial rewrites whenever a new card is introduced.
+
+⸻
+
+25. Game Simulation and Performance
+
+The game should use a consistent simulation model.
+
+Simulation Requirements
+
+* All gameplay calculations use consistent time steps.
+* Attacks and cooldowns are not dependent on rendering frame rate.
+* Units cannot attack after dying.
+* Dead targets are removed from targeting systems.
+* Troops should not attack out-of-range enemies.
+* Elixir cannot become negative.
+* Invalid deployments should be rejected.
+* Multiple attacks occurring on the same simulation tick should resolve consistently.
+
+Performance
+
+The game should remain smooth when many troops are active simultaneously.
+
+Possible optimizations include:
+
+* Object pooling for projectiles and effects.
+* Efficient spatial queries.
+* Limited-frequency target searches.
+* Simplified collision calculations.
+* Efficient pathfinding updates.
+* Animation culling for off-screen objects.
+* Separating visual effects from gameplay calculations.
+
+The game should remain playable on lower-powered devices.
+
+⸻
+
+26. Testing and Balancing
+
+Gameplay balance is essential.
+
+Every card should have strengths, weaknesses, and reasonable counters.
+
+Important Testing Scenarios
+
+Deployment Tests
+
+Confirm that cards cannot be played without enough elixir or outside valid placement areas.
+
+Card Cycle Tests
+
+Confirm that played cards return to the hand in the correct order.
+
+Targeting Tests
+
+Confirm that ground-only troops ignore flying units and building-focused troops prioritize buildings.
+
+Pathfinding Tests
+
+Confirm that troops cross bridges correctly and do not become trapped.
+
+Combat Tests
+
+Confirm that damage, attack speed, and status effects work correctly.
+
+Tower Tests
+
+Confirm tower activation, automatic targeting, and destruction behavior.
+
+Match Tests
+
+Confirm victory, overtime, tiebreakers, and simultaneous destruction events.
+
+Multiplayer Tests
+
+Confirm both players receive consistent match states.
+
+Disconnect Tests
+
+Confirm the game behaves predictably when a player loses connection.
+
+Balance Metrics
+
+The game should record useful statistics such as:
+
+* Card usage rates.
+* Card win rates.
+* Average match duration.
+* Average elixir spent.
+* Frequency of three-crown wins.
+* Average damage dealt by each card.
+* Most common deck combinations.
+
+These metrics can help identify cards that are excessively strong or weak.
+
+⸻
+
+27. Development Roadmap
+
+I do not expect the entire game to be completed at once.
+
+I would like development to happen in phases.
+
+Phase 1 — Core Arena Prototype
+
+Create:
+
+* A playable battlefield.
+* Two player territories.
+* Two bridges.
+* Six towers.
+* Basic movement and targeting.
+* One playable troop.
+* Basic tower damage.
+
+Goal: A troop can be deployed, cross a bridge, attack an enemy tower, and eventually destroy it.
+
+Phase 2 — Card Combat
+
+Add:
+
+* Eight-card decks.
+* Four-card hands.
+* Card cycling.
+* Elixir generation.
+* Multiple troop types.
+* Buildings.
+* Spells.
+* Health and damage.
+* Basic combat effects.
+
+Goal: The player can complete a full strategic match against a basic opponent.
+
+Phase 3 — Match Rules and AI
+
+Implement:
+
+* Match timer.
+* Crown counting.
+* King Tower activation.
+* Overtime.
+* Victory and defeat.
+* AI opponent.
+* Basic match results screen.
+
+Goal: A complete match can be played from beginning to end.
+
+Phase 4 — Multiplayer
+
+Add:
+
+* Server-authoritative gameplay.
+* Player matchmaking.
+* Real-time synchronization.
+* Match state replication.
+* Disconnect handling.
+* Basic anti-cheat validation.
+
+Goal: Two real players can compete online reliably.
+
+Phase 5 — UI and Polish
+
+Implement:
+
+* Main menu.
+* Card collection.
+* Deck builder.
+* Improved animations.
+* Sound effects.
+* Refined battlefield visuals.
+* Complete match HUD.
+
+Goal: The game feels like a cohesive, polished product.
+
+Phase 6 — Long-Term Progression
+
+Add:
+
+* Trophies.
+* Arena unlocks.
+* Card levels.
+* Rewards.
+* Currency.
+* Chests.
+* Player profiles.
+
+Phase 7 — Advanced Features
+
+Add:
+
+* Evolved cards.
+* Hero abilities.
+* More cards.
+* More game modes.
+* Ranked seasons.
+* Tournaments.
+* Cosmetics.
+* Social features.
+
+⸻
+
+28. Minimum Viable Product Requirements
+
+Before adding progression systems or advanced content, the game should meet these requirements:
+
+1. Two players or one player and an AI can enter a match.
+2. Each player has three functioning towers.
+3. Each player has an eight-card deck.
+4. Four cards are available in the active hand.
+5. Cards cycle correctly when played.
+6. Elixir generates and is deducted correctly.
+7. Players can deploy cards through drag-and-drop.
+8. Troops move and select targets automatically.
+9. Ground troops correctly use bridges.
+10. Flying troops can cross the river.
+11. Units attack and take damage.
+12. Spells apply their intended effects.
+13. Towers automatically defend themselves.
+14. Destroyed towers stop functioning.
+15. The King Tower activates appropriately.
+16. Match timers and overtime work.
+17. Victory and defeat are calculated correctly.
+18. The game can be restarted for another match.
+19. All major gameplay rules are enforced by the game simulation.
+20. The experience remains smooth with multiple active units.
+
+⸻
+
+29. Overall Gameplay Experience
+
+The primary objective is to recreate the strategic feel of a fast-paced, lane-based card battler.
+
+The game should not simply be about who has the most powerful cards.
+
+It should reward players who understand timing, resource management, placement, troop interactions, and deck composition.
+
+Every deployment should matter.
+
+A cheap defensive card placed correctly should sometimes be more valuable than an expensive offensive card placed poorly.
+
+Players should constantly decide whether to defend, counterattack, build a larger push, or save elixir for a better opportunity.
+
+The game should create exciting moments when large groups of troops clash, towers barely survive, and a perfectly timed card changes the outcome of a match.
+
+Most importantly, the underlying systems should be flexible enough to support dozens or eventually hundreds of unique cards without requiring the entire game to be rebuilt.
+
+The final goal is a polished, competitive, real-time multiplayer strategy game built around automated troop combat, tactical card placement, limited resources, and tower destruction.
+
+Use original characters, sounds, visuals, and branding while preserving the core strategic principles that make this genre engaging.
